@@ -12,6 +12,7 @@ BINARY=main
 BINARY_WIN=${BINARY}-win
 BINARY_OSX=${BINARY}-darwin
 BINARY_LINUX=${BINARY}-linux
+file=abi/${contract}.sol/${contract}
 
 ARCH_64=amd64
 ARCH_32=386
@@ -30,6 +31,16 @@ OSX_64=${BINARY_LINUX}-${ARCH_64}
 test:
 	@go test -v ./... -count 1 -race -covermode=atomic
 	@echo "[OK] test finished"
+
+
+# https://geth.ethereum.org/docs/tools/abigen
+# https://geth.ethereum.org/docs/getting-started/installing-geth
+# eg:
+# abigen --abi out/RightsPolicyManager.sol/RightsPolicyManager.abi.json --bin out/RightsPolicyManager.sol/RightsPolicyManager.bin /
+# --pkg synapse --type RightsPolicyManager --out RightsPolicyManager.go
+.PHONY: generate ## generate contract using abigen
+generate:
+	@abigen --abi ${file}.abi.json --bin ${file}.bin --pkg contracts --type ${contract} --out contracts/${contract}.go
 
 # Could be compared using
 # make benchmark > a.old
@@ -77,7 +88,7 @@ preview-doc:
 
 .PHONY: build ## compiles the command into and executable
 build:
-	@go build -v ./...
+	@CGO_ENABLED=0 GOOS=linux go build -v -o ${output} ${input} 
 
 .PHONY: format ## automatically formats Go source cod
 format: 
@@ -137,6 +148,7 @@ update-pkg-cache:
 # https://go.dev/ref/mod#go-mod-vendor
 .PHONY: lock ## lock dependencies
 lock:
+	@go mod tidy
 	@go mod vendor
 	@echo "[OK]"
 

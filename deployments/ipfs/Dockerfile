@@ -39,5 +39,6 @@ COPY --from=builder $SRC_DIR/bin/container_init_run /usr/local/bin/container_ini
 
 # Fix permissions on start_ipfs
 RUN chmod 0755 /usr/local/bin/start_ipfs
-
+# init.d script IPFS runs before starting the daemon. Used to manipulate the IPFS config file.
+COPY init.private.sh /container-init.d/001-config.sh
 

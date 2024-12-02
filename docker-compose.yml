@@ -1,0 +1,41 @@
+services:
+  # ipfs:
+  #   build: 
+  #     context: ./ipfs
+  #   restart: unless-stopped
+  #   entrypoint: [ "/bin/sh", "/scripts/init.private.sh" ]
+  #   env_file:
+  #     - ../.env
+  #   volumes:
+  #     - ./ipfs/:/scripts
+  #     - ipfs_fuse:/ipfs
+  #     - ipns_fuse:/ipns
+  #   ports:
+  #     - "4001:4001/tcp"
+  #     - "4001:4001/udp"
+  #     - "127.0.0.1:8080:8080"
+  #     - "127.0.0.1:5001:5001"
+  guardian:
+    build: .
+    restart: always
+    env_file:
+       - .env
+    ports:
+      - "5926:5926"
+    network_mode: host
+  nginx:
+    image: nginx
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+      - "443:443"
+    volumes:
+      - ./deployments/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    network_mode: host
+    depends_on:
+      - guardian
+
+# persisting named volumes
+volumes:
+  ipfs_fuse:
+  ipns_fuse:

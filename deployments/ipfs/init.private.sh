@@ -1,12 +1,13 @@
 echo "Running ipfs in ${IPFS_PATH}"
 
 if [ ! -e ${IPFS_PATH}/config ]; then
+       echo "Initializing IPFS repo at ${IPFS_PATH}"
        ipfs init --empty-repo
 fi
 
 # shellcheck disable=SC2006
-ipfs config Addresses.API '/ip4/0.0.0.0/tcp/5001'
-ipfs config Addresses.Gateway '/ip4/0.0.0.0/tcp/8080'
+ipfs config Addresses.API '/ip4/127.0.0.1/tcp/5001'
+ipfs config Addresses.Gateway '/ip4/127.0.0.1/tcp/8080'
 ipfs bootstrap rm all
 
 ipfs config --json Import.CidVersion '1'
@@ -56,36 +57,38 @@ ipfs config Gateway.DeserializedResponses true --bool
 
 # increase bit array to avoid collisions..
 ipfs config Datastore.BloomFilterSize "1048576" --json
-ipfs config Datastore.Spec.mounts "[
-       {
-              \"child\": {
-                     \"bucket\": \"$IPFS_S3_BUCKET\",
-                     \"region\": \"$IPFS_S3_REGION\",
-                     \"rootDirectory\": \"$IPFS_AWS_ACCESS_KEY\",
-                     \"accessKey\": \"$IPFS_AWS_SECRET_KEY\",
-                     \"secretKey\":\"\",
-                     \"type\": \"s3ds\"
+
+# force the use of s3 datastore
+if [ "$IPFS_DATASTORE" = "s3" ]; then
+       ipfs config Datastore.Spec.mounts "[
+              {
+                     \"child\": {
+                            \"bucket\": \"$IPFS_S3_BUCKET\",
+                            \"region\": \"$IPFS_S3_REGION\",
+                            \"rootDirectory\": \"\",
+                            \"accessKey\": \"\",
+                            \"secretKey\":\"\",
+                            \"type\": \"s3ds\"
+                     },
+                     \"mountpoint\": \"/blocks\",
+                     \"prefix\": \"s3.datastore\",
+                     \"type\": \"measure\"
               },
-              \"mountpoint\": \"/blocks\",
-              \"prefix\": \"s3.datastore\",
-              \"type\": \"measure\"
-       },
-       {
-              \"child\": {
-                     \"compression\": \"none\",
-                     \"path\": \"datastore\",
-                     \"type\": \"levelds\"
-              },
-              \"mountpoint\": \"/\",
-              \"prefix\": \"leveldb.datastore\",
-              \"type\": \"measure\"
-       }
-]" --json
+              {
+                     \"child\": {
+                            \"compression\": \"none\",
+                            \"path\": \"datastore\",
+                            \"type\": \"levelds\"
+                     },
+                     \"mountpoint\": \"/\",
+                     \"prefix\": \"leveldb.datastore\",
+                     \"type\": \"measure\"
+              }
+       ]" --json
+fi
 
 ipfs config Datastore.GCPeriod "144h"
 ipfs config Datastore.StorageMax "3000GB"
 ipfs config Datastore.StorageGCWatermark 99 --json
 ipfs config Pubsub.Router "gossipsub"
 ipfs config --json Swarm.DisableBandwidthMetrics false
-
-# ipfs config show > ${IPFS_PATH}/config
