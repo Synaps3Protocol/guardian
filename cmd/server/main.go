@@ -1,21 +1,16 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
-	"math/big"
 	"net/http"
 	"os"
 	"path"
 	"strings"
 
-	"github/Synaps3Protocol/guardian/internal/contracts"
-
-	"github.com/ethereum/go-ethereum/common"
 	ec "github.com/ethereum/go-ethereum/ethclient"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -110,32 +105,6 @@ func getSepFromId(ctx context.Context, kubo *kr.HttpApi, id string) (Sep, error)
 }
 
 // TODO refactor all this to modules
-
-func verifySignature(eth *ec.Client, signer common.Address, hash [32]byte, sig []byte) bool {
-	instance, _ := contracts.NewKernel(signer, eth)
-	valid, err := instance.IsValidSignature(nil, hash, sig)
-
-	if err != nil {
-		return false
-	}
-
-	expected := common.Hex2Bytes("0x1626ba7e")
-	return bytes.Equal(valid[:], expected)
-}
-
-func hasAccessGranted(eth *ec.Client, account common.Address, assetId *big.Int) (bool, common.Address) {
-
-	address := common.HexToAddress("0x46070176038ad75fd5da0129a0d55272888930fa")
-	instance, _ := contracts.NewRightsPolicyManager(address, eth)
-	valid, policy, err := instance.GetActivePolicy(nil, account, assetId)
-
-	if err != nil || !valid {
-		return false, policy
-	}
-
-	return true, policy
-
-}
 
 func fetchHandler(kubo *kr.HttpApi, eth *ec.Client) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
