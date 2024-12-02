@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	ec "github.com/ethereum/go-ethereum/ethclient"
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/render"
@@ -174,13 +175,18 @@ func metaHandler(kubo *kr.HttpApi) func(w http.ResponseWriter, r *http.Request) 
 // handler
 func main() {
 
-	c := chi.NewRouter()
+	r := chi.NewRouter()
 	err := de.Load(".env")
 	if err != nil {
 		log.Fatalf("Error loading .env file: %s", err)
 	}
 
-	c.Use(cors.Handler(cors.Options{
+	r.Use(middleware.Logger)
+	r.Use(middleware.NoCache)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Compress(5, "/*"))
+	r.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
 		AllowedOrigins: []string{"https://*", "http://*"},
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
@@ -208,12 +214,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	c.Get("/fetch/{id}/", fetchHandler(kubo, client))
-	c.Get("/fetch/{id}/{sub}", fetchHandler(kubo, client))
-	c.Get("/metadata/{id}/", metaHandler(kubo))
+	r.Get("/fetch/{id}/", fetchHandler(kubo, client))
+	r.Get("/fetch/{id}/{sub}", fetchHandler(kubo, client))
+	r.Get("/metadata/{id}/", metaHandler(kubo))
 
 	// Start the node on port 8080, and log any errors
 	port := fmt.Sprintf(":%s", os.Getenv("NODE_PORT"))
 	log.Printf("Running node on port %s", port)
-	log.Panic(http.ListenAndServe(port, c))
+	log.Panic(http.ListenAndServe(port, r))
 }
