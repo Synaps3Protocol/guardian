@@ -44,7 +44,7 @@ type Technical struct {
 }
 
 type Attachment struct {
-	CID         string `json:"cid"`
+	Cid         string `json:"cid"`
 	Type        string `json:"type"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
@@ -108,7 +108,7 @@ func getSepFromId(ctx context.Context, kubo *kr.HttpApi, id string) (Sep, error)
 
 // TODO refactor all these to modules
 
-func fetchHandler(kubo *kr.HttpApi, eth *ec.Client) func(w http.ResponseWriter, r *http.Request) {
+func contentHandler(kubo *kr.HttpApi, eth *ec.Client) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := chi.URLParam(r, "id")
 		sub := chi.URLParam(r, "sub")
@@ -135,7 +135,7 @@ func fetchHandler(kubo *kr.HttpApi, eth *ec.Client) func(w http.ResponseWriter, 
 			}
 		}
 
-		log.Printf("Service file %s", sub)
+		log.Printf("Service file %s from %s", sub, id)
 		file, err := readUnixFile(ctx, kubo, path.Join("/ipfs/", id, sub))
 		// // no dir nav allowed, absolute file only
 		// // If the file isn't a regular file, nil value will be returned
@@ -217,8 +217,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	r.Get("/fetch/{id}/", fetchHandler(kubo, client))
-	r.Get("/fetch/{id}/{sub}", fetchHandler(kubo, client))
+	r.Get("/content/{id}/", contentHandler(kubo, client))
+	r.Get("/content/{id}/{sub}", contentHandler(kubo, client))
 	r.Get("/metadata/{id}/", metaHandler(kubo))
 
 	// Start the node on port 8080, and log any errors

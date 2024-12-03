@@ -1,3 +1,6 @@
+
+#!/bin/bash
+
 echo "Running ipfs in ${IPFS_PATH}"
 
 if [ ! -e ${IPFS_PATH}/config ]; then
@@ -15,7 +18,7 @@ ipfs config --json Experimental.FilestoreEnabled true
 ipfs config --json Experimental.UrlstoreEnabled false
 
 ipfs config Swarm.Transports.Network.Websocket --json true
-ipfs config Swarm.Transports.Network.WebTransport --json true
+ipfs config Swarm.Transports.Network.WebTransport --json false
 ipfs config Swarm.Transports.Network.WebRTCDirect --json false
 ipfs config Swarm.ConnMgr.LowWater 30 --json
 ipfs config Swarm.ConnMgr.HighWater 50 --json
@@ -25,9 +28,7 @@ ipfs config Addresses.Swarm '[
        "/ip6/::/tcp/4001",
        "/ip4/0.0.0.0/tcp/0/ws",
        "/ip4/0.0.0.0/udp/4001/quic-v1",
-       "/ip4/0.0.0.0/udp/4001/quic-v1/webtransport",
        "/ip6/::/udp/4001/quic-v1",
-       "/ip6/::/udp/4001/quic-v1/webtransport"
 ]' --json
 
 ipfs config Swarm.AddrFilters '[
@@ -87,6 +88,8 @@ if [ "$IPFS_DATASTORE" = "s3" ]; then
        ]" --json
 fi
 
+# required in private network
+ipfs config Routing.Type "dht"
 ipfs config Datastore.GCPeriod "144h"
 ipfs config Datastore.StorageMax "3000GB"
 ipfs config Datastore.StorageGCWatermark 99 --json
