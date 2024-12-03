@@ -11,7 +11,6 @@ require (
 	github.com/ipfs/boxo v0.24.3
 	github.com/ipfs/go-cid v0.4.1
 	github.com/ipfs/kubo v0.32.1
-	github.com/joho/godotenv v1.5.1
 	github.com/multiformats/go-multiaddr v0.14.0
 )
 
