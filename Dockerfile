@@ -11,7 +11,7 @@ RUN go mod download
 
 # Mirror path
 COPY . .
-RUN make build output=/main input=/cmd/server/main.go
+RUN make build output=/main input=/cmd/node/main.go
 CMD ["/main"]
 
 
