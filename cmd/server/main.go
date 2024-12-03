@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	ec "github.com/ethereum/go-ethereum/ethclient"
 	"github.com/go-chi/chi/middleware"
@@ -105,7 +106,7 @@ func getSepFromId(ctx context.Context, kubo *kr.HttpApi, id string) (Sep, error)
 
 }
 
-// TODO refactor all this to modules
+// TODO refactor all these to modules
 
 func fetchHandler(kubo *kr.HttpApi, eth *ec.Client) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -182,10 +183,11 @@ func main() {
 	}
 
 	r.Use(middleware.Logger)
-	r.Use(middleware.NoCache)
+	// r.Use(middleware.NoCache)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.RealIP)
-	r.Use(middleware.Compress(5, "/*"))
+	r.Use(middleware.Timeout(time.Second * 60))
+	r.Use(middleware.Compress(6, "/*"))
 	r.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
 		AllowedOrigins: []string{"https://*", "http://*"},
@@ -194,7 +196,8 @@ func main() {
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: false,
-		MaxAge:           300, // Maximum value not ignored by any of major browsers
+		// preflight cache maximum value not ignored by any of major browsers
+		MaxAge: 300,
 	}))
 
 	localNodeAddress := os.Getenv("IPFS_API")
