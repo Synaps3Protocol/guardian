@@ -1,0 +1,9 @@
+abi/
+deployments/
+scripts/
+.vscode/
+
+.env
+.gitignore
+README.md
+docker-compose.yml

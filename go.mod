@@ -12,7 +12,7 @@ require (
 	github.com/ipfs/go-cid v0.4.1
 	github.com/ipfs/kubo v0.32.1
 	github.com/joho/godotenv v1.5.1
-	github.com/multiformats/go-multiaddr v0.13.0
+	github.com/multiformats/go-multiaddr v0.14.0
 )
 
 require (
