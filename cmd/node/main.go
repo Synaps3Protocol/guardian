@@ -21,7 +21,6 @@ import (
 	bp "github.com/ipfs/boxo/path"
 	"github.com/ipfs/go-cid"
 	kr "github.com/ipfs/kubo/client/rpc"
-	de "github.com/joho/godotenv"
 	ma "github.com/multiformats/go-multiaddr"
 )
 
@@ -177,11 +176,6 @@ func metaHandler(kubo *kr.HttpApi) func(w http.ResponseWriter, r *http.Request) 
 func main() {
 
 	r := chi.NewRouter()
-	err := de.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env file: %s", err)
-	}
-
 	r.Use(middleware.Logger)
 	// r.Use(middleware.NoCache)
 	r.Use(middleware.Recoverer)
