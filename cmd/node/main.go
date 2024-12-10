@@ -124,6 +124,7 @@ func contentHandler(kubo *kr.HttpApi, eth *ec.Client) func(w http.ResponseWriter
 			return
 		}
 
+		log.Printf("Attempt to find id %s", id)
 		// if the cid is a sep-001 standard switch the file served
 		if sep, err := getSepFromId(ctx, kubo, c.String()); err == nil {
 			log.Printf("Matched sep with id %s", id)
