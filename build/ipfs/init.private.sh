@@ -1,6 +1,6 @@
 
 #!/bin/bash
-
+source ../../env
 echo "Running ipfs in ${IPFS_PATH}"
 
 if [ ! -e ${IPFS_PATH}/config ]; then
