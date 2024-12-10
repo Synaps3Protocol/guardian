@@ -1,3 +1,3 @@
 .env 
 bin/ 
-init/swarm
+init/swarm.key
