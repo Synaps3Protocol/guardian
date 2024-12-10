@@ -74,7 +74,7 @@ if [ "$IPFS_DATASTORE" = "s3" ]; then
                      \"type\": \"measure\"
               }
        ]" --json
-
+       
        echo "{\"mounts\":[{\"bucket\":\"$IPFS_S3_BUCKET\",\"mountpoint\":\"/blocks\",\"region\":\"$IPFS_S3_REGION\",\"rootDirectory\":\"\"},{\"mountpoint\":\"/\",\"path\":\"datastore\",\"type\":\"levelds\"}],\"type\":\"mount\"}" > ${IPFS_PATH}/datastore_spec
        
 fi
@@ -99,3 +99,8 @@ ipfs config Datastore.StorageGCWatermark 99 --json
 ipfs config Pubsub.Router "gossipsub"
 ipfs config --json Swarm.DisableBandwidthMetrics false
 
+# add the swarm key from env
+(
+    echo -e '/key/swarm/psk/1.0.0/\n/base16/'; 
+    echo "$SWARM_KEY" | tr -d '\n '; echo '' 
+) > ${IPFS_PATH}/swarm.key
