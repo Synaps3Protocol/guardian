@@ -5,7 +5,7 @@ services:
     env_file:
        - .env
     ports:
-      - "5926:5926"
+      - "127.0.0.1:5926:5926"
     depends_on:
       - ipfs
   ipfs:
