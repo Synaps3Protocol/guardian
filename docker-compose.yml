@@ -8,6 +8,15 @@ services:
       - "127.0.0.1:5926:5926"
     depends_on:
       - ipfs
+  # cluster:
+  #   image: ipfs/ipfs-cluster:latest
+  #   depends_on:
+  #     - ipfs
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "127.0.0.1:9094:9094"
+  #     - "9096:9096" # Cluster swarm endpoint
   ipfs:
     build: ./build/ipfs
     restart: unless-stopped
