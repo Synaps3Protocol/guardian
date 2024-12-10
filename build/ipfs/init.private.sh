@@ -46,19 +46,6 @@ ipfs config Swarm.AddrFilters '[
 ]' --json
 
 
-echo "Running ipfs in server mode"
-ipfs config profile apply server
-ipfs config AutoNAT.ServiceMode "disabled"
-ipfs config Gateway.DeserializedResponses true --bool
-ipfs config Gateway.RootRedirect "" 
-ipfs config Gateway.NoFetch true --bool
-ipfs config Gateway.NoDNSLink false --bool
-ipfs config Gateway.PublicGateways '{}' --json
-ipfs config Gateway.DeserializedResponses true --bool
-
-# increase bit array to avoid collisions..
-ipfs config Datastore.BloomFilterSize "1048576" --json
-
 # force the use of s3 datastore
 if [ "$IPFS_DATASTORE" = "s3" ]; then
        echo "Using s3 datastore"
@@ -87,7 +74,22 @@ if [ "$IPFS_DATASTORE" = "s3" ]; then
                      \"type\": \"measure\"
               }
        ]" --json
+
+       echo "{\"mounts\":[{\"bucket\":\"$IPFS_S3_BUCKET\",\"mountpoint\":\"/blocks\",\"region\":\"$IPFS_S3_REGION\",\"rootDirectory\":\"\"},{\"mountpoint\":\"/\",\"path\":\"datastore\",\"type\":\"levelds\"}],\"type\":\"mount\"}" > ${IPFS_PATH}/datastore_spec
+       
 fi
+
+echo "Running ipfs in server mode"
+ipfs config profile apply server
+ipfs config AutoNAT.ServiceMode "disabled"
+ipfs config Gateway.DeserializedResponses true --bool
+ipfs config Gateway.RootRedirect "" 
+ipfs config Gateway.NoFetch true --bool
+ipfs config Gateway.NoDNSLink false --bool
+ipfs config Gateway.PublicGateways '{}' --json
+ipfs config Gateway.DeserializedResponses true --bool
+# increase bit array to avoid collisions..
+ipfs config Datastore.BloomFilterSize "1048576" --json
 
 # required in private network
 ipfs config Routing.Type "dht"
@@ -96,3 +98,4 @@ ipfs config Datastore.StorageMax "3000GB"
 ipfs config Datastore.StorageGCWatermark 99 --json
 ipfs config Pubsub.Router "gossipsub"
 ipfs config --json Swarm.DisableBandwidthMetrics false
+

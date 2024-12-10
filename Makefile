@@ -12,7 +12,7 @@ BINARY=main
 BINARY_WIN=${BINARY}-win
 BINARY_OSX=${BINARY}-darwin
 BINARY_LINUX=${BINARY}-linux
-file=abi/${contract}.sol/${contract}
+file=build/contracts/${contract}.sol/${contract}
 
 ARCH_64=amd64
 ARCH_32=386

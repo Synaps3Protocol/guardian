@@ -2,9 +2,11 @@ FROM golang:1.23.3
 
 WORKDIR /
 ENV GO111MODULE on
-COPY . .
+ENV CGO_ENABLED 0
+ENV GOOS linux
 
-RUN make build output=/main input=/cmd/node/main.go
+COPY . .
+RUN go build -v -o /main /cmd/node/main.go
 CMD ["/main"]
 
 
