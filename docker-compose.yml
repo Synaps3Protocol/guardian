@@ -25,8 +25,7 @@ services:
   nginx:
     build: ./build/nginx
     restart: unless-stopped
-    env_file:
-      - .env
+    
     ports:
       - "80:80"
     depends_on:
