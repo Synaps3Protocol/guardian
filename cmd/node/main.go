@@ -158,7 +158,10 @@ func contentHandler(kubo *kr.HttpApi, eth *ec.Client) func(w http.ResponseWriter
 func metaHandler(kubo *kr.HttpApi) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := chi.URLParam(r, "id")
-		ctx := context.Background()
+		parent := context.Background()
+		timeout := time.Second * 10
+		ctx, cancel := context.WithTimeout(parent, timeout)
+		defer cancel()
 
 		type Partial struct {
 			Type       string
@@ -166,6 +169,7 @@ func metaHandler(kubo *kr.HttpApi) func(w http.ResponseWriter, r *http.Request) 
 			Meta       Descriptive
 		}
 
+		log.Printf("Attempt to find id %s", id)
 		sep, err := getSepFromId(ctx, kubo, id)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
