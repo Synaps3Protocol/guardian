@@ -5,8 +5,8 @@ services:
     env_file:
        - .env
     network_mode: host
-    depends_on:
-      - ipfs
+    # depends_on:
+    #   - ipfs
   # cluster:
   #   image: ipfs/ipfs-cluster:latest
   #   depends_on:
