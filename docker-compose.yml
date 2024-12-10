@@ -14,7 +14,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./init/swarm.key:/data/ipfs/swarm.key
+      - ./init/swarm:/data/ipfs/swarm.key
       - ipfs_fuse:/ipfs
       - ipns_fuse:/ipns
     ports:
