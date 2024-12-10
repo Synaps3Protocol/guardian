@@ -1,11 +1,13 @@
+server {
+  listen 80 default_server;
+  listen [::]:80 default_server;
+  server_name _;
+  return 444;
+}
 
 server {
     listen ${PROXY_PORT};
     server_name ${PROXY_HOST};
-
-    # if ($host != ${PROXY_HOST}) {
-    #     return 444;
-    # }
     
     error_page 404 /404.html;
     error_log /var/log/nginx/debug_error.log debug;
