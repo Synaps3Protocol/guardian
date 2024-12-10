@@ -111,8 +111,12 @@ func contentHandler(kubo *kr.HttpApi, eth *ec.Client) func(w http.ResponseWriter
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := chi.URLParam(r, "id")
 		sub := chi.URLParam(r, "sub")
-		ctx := context.Background()
 		name := sub
+
+		timeout := time.Second * 10
+		parent := context.Background() // if do not find the data before 5 seconds, fail..
+		ctx, cancel := context.WithTimeout(parent, timeout)
+		defer cancel()
 
 		c, err := cid.Decode(id)
 		if err != nil {
