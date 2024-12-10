@@ -1,11 +1,4 @@
 server {
-  listen 80 default_server;
-  listen [::]:80 default_server;
-  server_name "";
-  return 444;
-}
-
-server {
     listen ${PROXY_PORT};
     server_name ${PROXY_HOST};
     
