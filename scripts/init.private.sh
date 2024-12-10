@@ -28,7 +28,7 @@ ipfs config Addresses.Swarm '[
        "/ip6/::/tcp/4001",
        "/ip4/0.0.0.0/tcp/0/ws",
        "/ip4/0.0.0.0/udp/4001/quic-v1",
-       "/ip6/::/udp/4001/quic-v1",
+       "/ip6/::/udp/4001/quic-v1"
 ]' --json
 
 ipfs config Swarm.AddrFilters '[
@@ -61,6 +61,7 @@ ipfs config Datastore.BloomFilterSize "1048576" --json
 
 # force the use of s3 datastore
 if [ "$IPFS_DATASTORE" = "s3" ]; then
+       echo "Using s3 datastore"
        ipfs config Datastore.Spec.mounts "[
               {
                      \"child\": {

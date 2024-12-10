@@ -136,8 +136,8 @@ func contentHandler(kubo *kr.HttpApi, eth *ec.Client) func(w http.ResponseWriter
 
 		log.Printf("Service file %s from %s", sub, id)
 		file, err := readUnixFile(ctx, kubo, path.Join("/ipfs/", id, sub))
-		// // no dir nav allowed, absolute file only
-		// // If the file isn't a regular file, nil value will be returned
+		// no dir nav allowed, absolute file only
+		// If the file isn't a regular file, nil value will be returned
 		if err != nil {
 			http.NotFound(w, r)
 			return
