@@ -1,6 +1,5 @@
 
 #!/bin/bash
-source ../../.env
 echo "Running ipfs in ${IPFS_PATH}"
 
 if [ ! -e ${IPFS_PATH}/config ]; then
@@ -100,7 +99,7 @@ ipfs config Pubsub.Router "gossipsub"
 ipfs config --json Swarm.DisableBandwidthMetrics false
 
 # add the swarm key from env
-(
-    echo -e '/key/swarm/psk/1.0.0/\n/base16/'; 
-    echo "$SWARM_KEY" | tr -d '\n '; echo '' 
-) > ${IPFS_PATH}/swarm.key
+# (
+#     echo -e '/key/swarm/psk/1.0.0/\n/base16/'; 
+#     echo "$SWARM_KEY" | tr -d '\n '; echo '' 
+# ) > ${IPFS_PATH}/swarm.key
