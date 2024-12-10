@@ -113,7 +113,7 @@ func contentHandler(kubo *kr.HttpApi, eth *ec.Client) func(w http.ResponseWriter
 		sub := chi.URLParam(r, "sub")
 		name := sub
 
-		timeout := time.Second * 10
+		timeout := time.Second * 5
 		parent := context.Background() // if do not find the data before 5 seconds, fail..
 		ctx, cancel := context.WithTimeout(parent, timeout)
 		defer cancel()
@@ -159,7 +159,7 @@ func metaHandler(kubo *kr.HttpApi) func(w http.ResponseWriter, r *http.Request) 
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := chi.URLParam(r, "id")
 		parent := context.Background()
-		timeout := time.Second * 10
+		timeout := time.Second * 5
 		ctx, cancel := context.WithTimeout(parent, timeout)
 		defer cancel()
 
