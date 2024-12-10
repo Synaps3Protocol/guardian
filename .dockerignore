@@ -6,5 +6,4 @@ scripts/
 .env
 .gitignore
 README.md
-init/swarm.key
 docker-compose.yml
