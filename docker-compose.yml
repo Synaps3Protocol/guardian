@@ -4,8 +4,7 @@ services:
     restart: always
     env_file:
        - .env
-    ports:
-      - "127.0.0.1:5926:5926"
+    network_mode: host
     depends_on:
       - ipfs
   # cluster:
@@ -17,24 +16,23 @@ services:
   #   ports:
   #     - "127.0.0.1:9094:9094"
   #     - "9096:9096" # Cluster swarm endpoint
-  ipfs:
-    build: ./build/ipfs
-    restart: unless-stopped
-    env_file:
-      - .env
-    volumes:
-      - ipfs_fuse:/ipfs
-      - ipns_fuse:/ipns
-    ports:
-      - "4001:4001/tcp"
-      - "4001:4001/udp"
-      - "127.0.0.1:8080:8080"
-      - "127.0.0.1:5001:5001"
+  # ipfs:
+  #   build: ./build/ipfs
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - ipfs_fuse:/ipfs
+  #     - ipns_fuse:/ipns
+  #   ports:
+  #     - "4001:4001/tcp"
+  #     - "4001:4001/udp"
+  #     - "127.0.0.1:8080:8080"
+  #     - "127.0.0.1:5001:5001"
   nginx:
     build: ./build/nginx
     restart: unless-stopped
-    ports:
-      - "80:80"
+    network_mode: host
     env_file:
       - .env
     depends_on:
