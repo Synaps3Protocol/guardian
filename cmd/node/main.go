@@ -182,6 +182,13 @@ func metaHandler(kubo *kr.HttpApi) func(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
+func health() func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	}
+}
+
 // handler
 func main() {
 
@@ -221,6 +228,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	r.Get("/healthcheck/", health())
 	r.Get("/content/{id}/", contentHandler(kubo, client))
 	r.Get("/content/{id}/{sub}", contentHandler(kubo, client))
 	r.Get("/metadata/{id}/", metaHandler(kubo))
