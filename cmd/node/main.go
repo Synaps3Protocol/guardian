@@ -228,10 +228,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	r.Get("/healthcheck/", health())
 	r.Get("/content/{id}/", contentHandler(kubo, client))
 	r.Get("/content/{id}/{sub}", contentHandler(kubo, client))
 	r.Get("/metadata/{id}/", metaHandler(kubo))
+	r.Get("/healthcheck/", health())
 
 	// Start the node on port 8080, and log any errors
 	port := fmt.Sprintf(":%s", os.Getenv("NODE_PORT"))
