@@ -234,7 +234,7 @@ func main() {
 	r.Get("/healthcheck/", health())
 
 	// Start the node on port 8080, and log any errors
-	port := fmt.Sprintf(":%s", os.Getenv("NODE_PORT"))
+	port := fmt.Sprintf("0.0.0.0:%s", os.Getenv("NODE_PORT"))
 	log.Printf("Running node on port %s", port)
 	log.Panic(http.ListenAndServe(port, r))
 }
