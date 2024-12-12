@@ -8,7 +8,7 @@ ENV GOOS linux
 COPY . .
 RUN go build -v -o /main /cmd/node/main.go
 
-EXPOSE 5926/tcp
+EXPOSE 5926
 CMD ["/main"]
 
 
