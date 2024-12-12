@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -17,6 +18,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/render"
+	lru "github.com/hashicorp/golang-lru/v2"
 	bf "github.com/ipfs/boxo/files"
 	bp "github.com/ipfs/boxo/path"
 	"github.com/ipfs/go-cid"
@@ -82,9 +84,15 @@ func readUnixFile(ctx context.Context, rpc *kr.HttpApi, path string) (bf.File, e
 	return file, nil
 }
 
-func getSepFromId(ctx context.Context, kubo *kr.HttpApi, id string) (Sep, error) {
+func getSepFromId(ctx context.Context, kubo *kr.HttpApi, cache *lru.Cache[string, Sep], id string) (Sep, error) {
 
 	var sep Sep
+	// check if id is in cache
+	if v, ok := cache.Get(id); ok {
+		log.Printf("Using cache for id: %s", id)
+		return v, nil
+	}
+
 	// collect the sep standard to retrieve content
 	standard, err := readUnixFile(ctx, kubo, path.Join("/ipfs/", id))
 	if err != nil {
@@ -101,13 +109,14 @@ func getSepFromId(ctx context.Context, kubo *kr.HttpApi, id string) (Sep, error)
 		return Sep{}, err
 	}
 
+	cache.Add(id, sep)
 	return sep, nil
 
 }
 
 // TODO refactor all these to modules
 
-func contentHandler(kubo *kr.HttpApi, eth *ec.Client) func(w http.ResponseWriter, r *http.Request) {
+func contentHandler(kubo *kr.HttpApi, eth *ec.Client, cache *lru.Cache[string, Sep]) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := chi.URLParam(r, "id")
 		sub := chi.URLParam(r, "sub")
@@ -126,7 +135,7 @@ func contentHandler(kubo *kr.HttpApi, eth *ec.Client) func(w http.ResponseWriter
 
 		log.Printf("Attempt to find id %s", id)
 		// if the cid is a sep-001 standard switch the file served
-		if sep, err := getSepFromId(ctx, kubo, c.String()); err == nil {
+		if sep, err := getSepFromId(ctx, kubo, cache, c.String()); err == nil {
 			log.Printf("Matched sep with id %s", id)
 			id = sep.S.Cid
 
@@ -155,7 +164,7 @@ func contentHandler(kubo *kr.HttpApi, eth *ec.Client) func(w http.ResponseWriter
 	}
 }
 
-func metaHandler(kubo *kr.HttpApi) func(w http.ResponseWriter, r *http.Request) {
+func metaHandler(kubo *kr.HttpApi, cache *lru.Cache[string, Sep]) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := chi.URLParam(r, "id")
 		// TODO refactor all this
@@ -171,7 +180,7 @@ func metaHandler(kubo *kr.HttpApi) func(w http.ResponseWriter, r *http.Request) 
 		}
 
 		log.Printf("Attempt to find id %s", id)
-		sep, err := getSepFromId(ctx, kubo, id)
+		sep, err := getSepFromId(ctx, kubo, cache, id)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
 			return
@@ -228,9 +237,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	r.Get("/content/{id}/", contentHandler(kubo, client))
-	r.Get("/content/{id}/{sub}", contentHandler(kubo, client))
-	r.Get("/metadata/{id}/", metaHandler(kubo))
+	cacheSize, err := strconv.Atoi(os.Getenv("LRU_CACHE_SIZE"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	lruCache, err := lru.New[string, Sep](cacheSize)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("Cache initialized with size to %d", cacheSize)
+	r.Get("/content/{id}/", contentHandler(kubo, client, lruCache))
+	r.Get("/content/{id}/{sub}", contentHandler(kubo, client, lruCache))
+	r.Get("/metadata/{id}/", metaHandler(kubo, lruCache))
 	r.Get("/healthcheck/", health())
 
 	// Start the node on port 8080, and log any errors
