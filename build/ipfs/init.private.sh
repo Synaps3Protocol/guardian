@@ -87,8 +87,8 @@ ipfs config Gateway.NoFetch true --bool
 ipfs config Gateway.NoDNSLink false --bool
 ipfs config Gateway.PublicGateways '{}' --json
 ipfs config Gateway.DeserializedResponses true --bool
-# increase bit array to avoid collisions..
-ipfs config Datastore.BloomFilterSize "1048576" --json
+# increase bit array to avoid collisions (false-positive)..
+# ipfs config Datastore.BloomFilterSize "9592955" --json 
 
 # required in private network
 ipfs config Routing.Type "dht"
