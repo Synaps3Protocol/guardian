@@ -1,0 +1,1 @@
+docker run -d --env-file .env --name guardian  --restart=always --network=host guardian/guardian 
