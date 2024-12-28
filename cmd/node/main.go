@@ -173,10 +173,14 @@ func metaHandler(kubo *kr.HttpApi, cache *lru.Cache[string, Sep]) func(w http.Re
 		ctx, cancel := context.WithTimeout(parent, timeout)
 		defer cancel()
 
+		type Data struct {
+			Descriptive
+			Extra
+		}
+
 		type Partial struct {
-			Type       string
-			Attachment []Attachment
-			Meta       Descriptive
+			Type string
+			Data Data
 		}
 
 		log.Printf("Attempt to find id %s", id)
@@ -187,7 +191,8 @@ func metaHandler(kubo *kr.HttpApi, cache *lru.Cache[string, Sep]) func(w http.Re
 		}
 
 		// serve json partial metadata
-		render.JSON(w, r, Partial{sep.S.Type, sep.X.Attachments, sep.D})
+		data := Data{sep.D, sep.X}
+		render.JSON(w, r, Partial{sep.S.Type, data})
 	}
 }
 
