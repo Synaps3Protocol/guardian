@@ -56,6 +56,7 @@ type Extra struct {
 	CustomFields map[string]interface{} `json:"custom_fields"`
 }
 
+// SEP-002
 type Sep struct {
 	S Structural  `json:"s"`
 	D Descriptive `json:"d"`
@@ -173,8 +174,10 @@ func metaHandler(kubo *kr.HttpApi, cache *lru.Cache[string, Sep]) func(w http.Re
 		ctx, cancel := context.WithTimeout(parent, timeout)
 		defer cancel()
 
+		// Embedding descriptive and extra
 		type Data struct {
 			Descriptive
+			Technical
 			Extra
 		}
 
@@ -191,7 +194,7 @@ func metaHandler(kubo *kr.HttpApi, cache *lru.Cache[string, Sep]) func(w http.Re
 		}
 
 		// serve json partial metadata
-		data := Data{sep.D, sep.X}
+		data := Data{sep.D, sep.T, sep.X}
 		render.JSON(w, r, Partial{sep.S.Type, data})
 	}
 }
