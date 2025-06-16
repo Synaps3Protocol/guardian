@@ -38,7 +38,7 @@ type Descriptive struct {
 }
 
 type Technical struct {
-	Size   int     `json:"size"`
+	Size   float32 `json:"size"`
 	Width  int     `json:"width"`
 	Height int     `json:"height"`
 	Length float32 `json:"length"`
