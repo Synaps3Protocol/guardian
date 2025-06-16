@@ -38,10 +38,10 @@ type Descriptive struct {
 }
 
 type Technical struct {
-	Size   int `json:"size"`
-	Width  int `json:"width"`
-	Height int `json:"height"`
-	Length int `json:"length"`
+	Size   int     `json:"size"`
+	Width  int     `json:"width"`
+	Height int     `json:"height"`
+	Length float32 `json:"length"`
 }
 
 type Attachment struct {
