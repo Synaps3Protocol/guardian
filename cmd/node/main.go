@@ -189,6 +189,7 @@ func metaHandler(kubo *kr.HttpApi, cache *lru.Cache[string, Sep]) func(w http.Re
 		log.Printf("Attempt to find id %s", id)
 		sep, err := getSepFromId(ctx, kubo, cache, id)
 		if err != nil {
+			log.Print(err)
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
